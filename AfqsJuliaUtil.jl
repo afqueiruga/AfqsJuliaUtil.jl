@@ -8,7 +8,7 @@ export polynomial_indices, polynomial_expansion
 function quotecat(quotes)
     ex = Expr(:block)
     for q in quotes
-        for line in q
+        for line in q.args
             push!(ex.args,line)
         end
     end
