@@ -4,6 +4,10 @@ using Combinatorics
 
 export ExprCat
 export polynomial_indices, polynomial_expansion
+export Azip
+
+"Do a zip but return a 2d array instead of a pesky array of tuples"
+Azip(dat...) = hcat([ collect(a) for a in zip(dat...)]...)
 
 # A bad way to join quotes, but the first I got to work
 function quotecat(quotes)
@@ -19,9 +23,11 @@ end
 # A better way to handle quotes
 sanitize_quotes(q::Expr) = (q.head == :block ? q.args : q )
 ExprCat(quotes::Array) = ExprCat(quotes...)
+"Join together an array of quotes and Expressions into one quote block."
 ExprCat(quotes...) = Expr(:block, vcat(map(sanitize_quotes,quotes)...)...)
 import Base.*
 *(quote1::Expr,quote2::Expr) = ExprCat(quote1,quote2)
+"String-concatenation syntax for an array of quotes and Expressions into one quote block."
 *(quotes::Expr...) = ExprCat(quotes...)
 
 
@@ -54,5 +60,6 @@ macro polynomial_function(len,order)
         end
     end
 end
+
 
 end
