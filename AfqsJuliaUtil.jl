@@ -45,4 +45,14 @@ function polynomial_expansion(x, order)
     map( i->reduce(*,1,x[i]), indcs)
 end
 
+macro polynomial_function(len,order)
+    terms = polynomial_indices(len,order)
+    multiply_terms(indcs) = Expr(:call,*,[:(x[$i]) for i in indcs]...)
+    quote
+        function poly(x::Array{NumT}) where {NumT <: Number}
+            NumT[$(map(multiply_terms,terms)...)]
+        end
+    end
+end
+
 end
