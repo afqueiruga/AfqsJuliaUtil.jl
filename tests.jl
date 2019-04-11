@@ -49,4 +49,9 @@ end;
 @testset "polynomials" begin
     @test_throws ArgumentError polynomial_indices(1,0)
     @test_throws ArgumentError polynomial_expansion([1],0)
+    
+    @test begin
+        p = @polynomial_function(1,1)
+        p(1.0) == 1.0
+    end
 end;

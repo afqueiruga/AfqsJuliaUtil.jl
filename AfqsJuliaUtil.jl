@@ -3,7 +3,7 @@ module AfqsJuliaUtil
 using Combinatorics
 
 export ExprCat
-export polynomial_indices, polynomial_expansion
+export polynomial_indices, polynomial_expansion, polynomial_function
 export Azip
 
 "Do a zip but return a 2d array instead of a pesky array of tuples"
@@ -32,6 +32,7 @@ import Base.*
 
 
 # Making polynomial basis sets
+"Return an array of all exponents for polynomials of `order` with `len` variables." 
 function polynomial_indices(len,order)
     if order <= 0
         throw(ArgumentError("Polynomial Order <= 0 does not make sense."))
@@ -46,17 +47,22 @@ function polynomial_indices(len,order)
     indcs
 end
 
+"Return all polynomial terms on an array x. Dynamically checks the length of x."
 function polynomial_expansion(x, order)
     indcs = polynomial_indices(length(x), order)
     map( i->reduce(*,1,x[i]), indcs)
 end
 
+"Return a function that calculates the terms of a polynomial for a fixed length
+array."
 macro polynomial_function(len,order)
     terms = polynomial_indices(len,order)
     multiply_terms(indcs) = Expr(:call,*,[:(x[$i]) for i in indcs]...)
     quote
         function poly(x::Array{NumT}) where {NumT <: Number}
-            NumT[$(map(multiply_terms,terms)...)]
+            @inbounds begin
+                NumT[$(map(multiply_terms,terms)...)]
+            end
         end
     end
 end
