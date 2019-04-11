@@ -3,7 +3,7 @@ module AfqsJuliaUtil
 using Combinatorics
 
 export ExprCat
-export polynomial_indices, polynomial_expansion, polynomial_function
+export polynomial_indices, polynomial_expansion, @polynomial_function
 export Azip
 
 "Do a zip but return a 2d array instead of a pesky array of tuples"
@@ -42,7 +42,7 @@ function polynomial_indices(len,order)
     end
     indcs = []
     for o in 1:order
-        append!(indcs, with_replacement_combinations(range(1,len),o) )
+        append!(indcs, with_replacement_combinations(1:len,o) )
     end
     indcs
 end
