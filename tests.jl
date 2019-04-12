@@ -50,8 +50,9 @@ end;
     @test_throws ArgumentError polynomial_indices(1,0)
     @test_throws ArgumentError polynomial_expansion([1],0)
     
-    @test begin
-        p = @polynomial_function(1,1)
-        p(1.0) == 1.0
-    end
+    p = @polynomial_function(1,1)
+    @test p(1.0) == 1.0
+    @test p([1.0]) == [1.0]
+    @test p([[1.0],[2.0]]) == [[1.0],[2.0]]
+
 end;
