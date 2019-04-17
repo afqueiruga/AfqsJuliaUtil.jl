@@ -51,8 +51,16 @@ end;
     @test_throws ArgumentError polynomial_expansion([1],0)
     
     p = @polynomial_function(1,1)
+    println(p)
     @test p(1.0) == 1.0
     @test p([1.0]) == [1.0]
     @test p([[1.0],[2.0]]) == [[1.0],[2.0]]
+
+    p3 = @polynomial_function(1,3)
+    println(p3)
+    @test p3(1.0) == [1.0,1.0,1.0]
+    @test p3([1.0]) == [1.0,1.0,1.0]
+    @test p3([[1.0]]) == [[1.0,1.0,1.0]]
+    @test p3([[1.0],[2.0]]) == [[1.0,1.0,1.0],[2.0,4.0,8.0]]
 
 end;

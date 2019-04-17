@@ -1,6 +1,7 @@
 module AfqsJuliaUtil
 
 using Combinatorics
+using MacroTools
 
 export ExprCat
 export polynomial_indices, polynomial_expansion, @polynomial_function
@@ -58,13 +59,34 @@ array."
 macro polynomial_function(len,order)
     terms = polynomial_indices(len,order)
     multiply_terms(indcs) = Expr(:call,*,[:(x[$i]) for i in indcs]...)
-    quote
+    Q = quote
         function poly(x::Array{NumT}) where {NumT <: Number}
             @inbounds begin
                 NumT[$(map(multiply_terms,terms)...)]
             end
         end
+        function poly(x::Array{Array{NumT,1},1}) where {NumT <: Number}
+            poly.(x)
+        end
+        function poly(x::Array{NumT,2}) where {NumT <: Number}
+            poly.(x)
+        end
+    end 
+    if len==1 && order==1
+        Q *= quote
+            function poly(x::NumT) where {NumT <:Number}
+                poly([x])[1]
+            end
+        end
+    elseif len==1
+         Q *= quote
+            function poly(x::NumT) where {NumT <:Number}
+                poly([x])
+            end
+        end 
     end
+    # println(rmlines(Q))
+    Q
 end
 
 
