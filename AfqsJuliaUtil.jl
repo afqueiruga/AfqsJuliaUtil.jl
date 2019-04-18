@@ -69,7 +69,8 @@ macro polynomial_function(len,order)
             poly.(x)
         end
         function poly(x::Array{NumT,2}) where {NumT <: Number}
-            poly.(x)
+            #hcat(poly.(x)...)
+            hcat([poly(y) for y in x])
         end
     end 
     if len==1 && order==1
