@@ -3,9 +3,22 @@ module AfqsJuliaUtil
 using Combinatorics
 using MacroTools
 
+using Images
+using Plots
+
 export ExprCat
 export polynomial_indices, polynomial_expansion, @polynomial_function
 export Azip
+export plot_array2img
+
+"Plot an array as an image, automatically squaring it if needed."
+function plot_array2img(A::Array{T}, shape=0) where T
+    if shape==0
+        shape = map(y->trunc(Int,y), ( (sqrt(length(A))),length(A)/sqrt(length(A)) ) )
+    end
+    cv = colorview(Gray, reshape(A, shape) )
+    #plot(0:1:shape[1],0:1:shape[2], cv)
+end
 
 "Do a zip but return a 2d array instead of a pesky array of tuples"
 Azip(dat...) = hcat([ collect(a) for a in zip(dat...)]...)
@@ -70,7 +83,7 @@ macro polynomial_function(len,order)
         end
         function poly(x::Array{NumT,2}) where {NumT <: Number}
             #hcat(poly.(x)...)
-            hcat([poly(y) for y in x])
+            hcat([poly(y) for y in x]...)
         end
     end 
     if len==1 && order==1
