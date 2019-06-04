@@ -73,15 +73,15 @@ macro polynomial_function(len,order)
     terms = polynomial_indices(len,order)
     multiply_terms(indcs) = Expr(:call,*,[:(x[$i]) for i in indcs]...)
     Q = quote
-        @inline function poly(x::Array{NumT}) where {NumT <: Number}
+        @inline function poly(x::AbstractArray{NumT}) where {NumT <: Number}
             @inbounds begin
                 NumT[$(map(multiply_terms,terms)...)]
             end
         end
-        @inline function poly(x::Array{Array{NumT,1},1}) where {NumT <: Number}
+        @inline function poly(x::AbstractArray{AbstractArray{NumT,1},1}) where {NumT <: Number}
             poly.(x)
         end
-        @inline function poly(x::Array{NumT,2}) where {NumT <: Number}
+        @inline function poly(x::AbstractArray{NumT,2}) where {NumT <: Number}
             #hcat(poly.(x)...)
             hcat([poly(y) for y in x]...)
         end
@@ -106,17 +106,20 @@ end
 function polynomial_function(len,order)
     terms = polynomial_indices(len,order)
     multiply_terms(indcs) = Expr(:call,*,[:(x[$i]) for i in indcs]...)
+    asgn(lhs,rhs) = :( $lhs = $(multiply_terms(rhs)) )
     poly = gensym("poly")
     Q = quote
-        @inline function $poly(x::Array{NumT}) where {NumT <: Number}
+        @inline function $poly(x::ArrT) :: ArrT where {ArrT <: AbstractArray}
             @inbounds begin
-                NumT[$(map(multiply_terms,terms)...)]
+                arr = similar(x, dims=$(length(terms)))
+                $(ExprCat([asgn(:(arr[$i]),terms[i]) for i in 1:length(terms)]))
+                arr
             end
         end
-        @inline function $poly(x::Array{Array{NumT,1},1}) where {NumT <: Number}
+        @inline function $poly(x::AbstractArray{AbstractArray{NumT,1},1}) where {NumT <: Number}
             $poly.(x)
         end
-        @inline function $poly(x::Array{NumT,2}) where {NumT <: Number}
+        @inline function $poly(x::AbstractArray{NumT,2}) where {NumT <: Number}
             #hcat(poly.(x)...)
             hcat([$poly(y) for y in x]...)
         end
